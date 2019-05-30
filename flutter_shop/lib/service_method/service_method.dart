@@ -9,11 +9,11 @@ Future getHomePageContent() async{
     print("开始获取首页数据......");
     Response response;
     Dio dio = Dio();
-    dio.options.contentType = ContentType.parse("application/x-www-form-urlencoded");
-    var formData = {'lon':'115.02932','lat':'35.76189'};
-    response = await dio.post(servicePath['homePageContent'],data: formData);
+    dio.options.contentType=ContentType.parse("application/json; charset=utf-8");
+    response = await dio.post(servicePath['homePageContent']);
+    print("获取首页数据：$response");
     if(response.statusCode == 200){
-      return response.data;
+      return response;
     }else{
       return Exception("后端接口出现异常");
     }
