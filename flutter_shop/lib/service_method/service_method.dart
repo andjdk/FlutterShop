@@ -8,7 +8,7 @@ import '../config/service_url.dart';
 Future request(url,{formData}) async{
   try{
 
-    print("开始获取首页数据......");
+    print("request......");
     Response response;
     Dio dio = Dio();
     dio.options.contentType=ContentType.parse("application/json; charset=utf-8");
@@ -17,7 +17,7 @@ Future request(url,{formData}) async{
     }else{
       response = await dio.post(servicePath[url],data: formData);
     }
-    print("获取首页数据：$response");
+    print("request result：$response");
     if(response.statusCode == 200){
       return response;
     }else{

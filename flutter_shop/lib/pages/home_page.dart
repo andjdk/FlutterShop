@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_shop/service_method/service_method.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_easyrefresh/easy_refresh.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -17,6 +18,8 @@ class _HomePageState extends State<HomePage>
     with AutomaticKeepAliveClientMixin {
   int page = 1;
   List<Map> hotGoodsList = [];
+
+  GlobalKey<RefreshFooterState> _footerKey = new GlobalKey<RefreshFooterState>();
 
   @override
   bool get wantKeepAlive => true;
@@ -55,8 +58,18 @@ class _HomePageState extends State<HomePage>
                 List<Map> floor1 = (data['data']['floor1'] as List).cast();
                 List<Map> floor2 = (data['data']['floor2'] as List).cast();
                 List<Map> floor3 = (data['data']['floor3'] as List).cast();
-                return SingleChildScrollView(
-                  child: Column(
+                return EasyRefresh(
+                  refreshFooter: ClassicsFooter(
+                    key: _footerKey,
+                    bgColor: Colors.white,
+                    textColor: Colors.pink,
+                    moreInfoColor: Colors.pink,
+                    showMore: true,
+                    noMoreText: "",
+                    moreInfo: "加载中",
+                    loadReadyText: '上拉加载.....',
+                  ),
+                  child: ListView(
                     children: <Widget>[
                       SwiperDiy(swiperDateList: swiper),
                       TopNavigator(navigatorList: navigatorList),
@@ -75,6 +88,10 @@ class _HomePageState extends State<HomePage>
                       _hotGoods(),
                     ],
                   ),
+                  loadMore: ()  {
+                    print("开始加载更多");
+                    _getHotGoods();
+                  },
                 );
               } else {
                 return Center(
@@ -84,9 +101,9 @@ class _HomePageState extends State<HomePage>
             }));
   }
 
-  void _getHotGoods() {
+  Future _getHotGoods() async {
     var formPage = {'page': page};
-    request('homePageHotGoodsContent', formData: formPage).then((val) {
+    await request('homePageHotGoodsContent', formData: formPage).then((val) {
       var data = json.decode(val.toString());
       List<Map> newGoodsList = (data['data'] as List).cast();
       setState(() {
@@ -216,6 +233,7 @@ class TopNavigator extends StatelessWidget {
       height: ScreenUtil().setHeight(320),
       padding: EdgeInsets.all(3.0),
       child: GridView.count(
+        physics: NeverScrollableScrollPhysics(),
         crossAxisCount: 5,
         padding: EdgeInsets.all(5),
         children: navigatorList.map((item) {
