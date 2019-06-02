@@ -146,7 +146,7 @@ class CategoryGoodsList extends StatefulWidget {
 }
 
 class _CategoryGoodsListState extends State<CategoryGoodsList> {
-  List<CategoryGoodsData> categoryGoodsList = [];
+  List<CategoryListData> categoryGoodsList = [];
 
   @override
   void initState() {
@@ -156,49 +156,75 @@ class _CategoryGoodsListState extends State<CategoryGoodsList> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-        child: _goodsItem(),
-    );
+    return Expanded(
+        flex: 1,
+        child:Container(
+          width: ScreenUtil().setWidth(570),
+          child: _goodsItem(),
+        ) ,
+      );
   }
 
   Widget _goodsItem() {
-    print("sssss${categoryGoodsList.length}");
-    if(categoryGoodsList.length !=0){
-      List<Widget> goodsWidget = categoryGoodsList.map((val){
+    if (categoryGoodsList.length != 0) {
+      List<Widget> goodsWidget = categoryGoodsList.map((val) {
         return InkWell(
-          onTap: () {},
-          child: Column(
-            children: <Widget>[
-              Image.network(val.image),
-//              Text('￥${val.oriPrice}'),
-//              Text(
-//                '￥${val.presentPrice}',
-//                style: TextStyle(
-//                    decoration: TextDecoration.lineThrough, color: Colors.grey),
-//              )
-            ],
-          ),
-        );
+            onTap: () {},
+            child: Container(
+              padding: EdgeInsets.all(5),
+              width: ScreenUtil().setWidth(280),
+              child: Column(
+                children: <Widget>[
+                  Image.network(val.image,
+                      width: ScreenUtil().setWidth(280),
+                      height: ScreenUtil().setHeight(280)),
+                  Text(
+                    '${val.goodsName}',
+                    style: TextStyle(
+                      color: Colors.pink,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Text(' ￥${val.oriPrice}   '),
+                      Text(
+                        ' ￥${val.presentPrice}',
+                        style: TextStyle(
+                            decoration: TextDecoration.lineThrough,
+                            color: Colors.grey),
+                      )
+                    ],
+                  )
+                ],
+              ),
+            ));
       }).toList();
 
       return Wrap(
         spacing: 2,
         children: goodsWidget,
       );
-    }else{
+    } else {
       return Text("没有相关商品");
     }
-
   }
 
   void _getGoodsList() async {
-    var data = {"categoryId": "4", "categorySubId": "", "page": 1};
+    var data = {"categoryId": '4', "categorySubId": "", "page": 1};
     await request('getGoodsList', formData: data).then((val) {
       var data = json.decode(val.toString());
-      CategoryGoodsModel goodsModel = CategoryGoodsModel.fromJson(data);
-      setState(() {
-        categoryGoodsList = goodsModel.data;
-      });
+      try {
+        CategoryGoodsListModel goodsList =
+            CategoryGoodsListModel.fromJson(data);
+
+        setState(() {
+          categoryGoodsList = goodsList.data;
+        });
+      } catch (e) {
+        print("出现异常：$e");
+      }
     });
   }
 }

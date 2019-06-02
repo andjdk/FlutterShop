@@ -1,17 +1,17 @@
-class CategoryGoodsModel {
+class CategoryGoodsListModel {
   String code;
   String message;
-  List<CategoryGoodsData> data;
+  List<CategoryListData> data;
 
-  CategoryGoodsModel({this.code, this.message, this.data});
+  CategoryGoodsListModel({this.code, this.message, this.data});
 
-  CategoryGoodsModel.fromJson(Map<String, dynamic> json) {
+  CategoryGoodsListModel.fromJson(Map<String, dynamic> json) {
     code = json['code'];
     message = json['message'];
     if (json['data'] != null) {
-      data = new List<CategoryGoodsData>();
+      data = new List<CategoryListData>();
       json['data'].forEach((v) {
-        data.add(new CategoryGoodsData.fromJson(v));
+        data.add(new CategoryListData.fromJson(v));
       });
     }
   }
@@ -27,21 +27,21 @@ class CategoryGoodsModel {
   }
 }
 
-class CategoryGoodsData {
+class CategoryListData {
   String image;
   double oriPrice;
   double presentPrice;
   String goodsName;
   String goodsId;
 
-  CategoryGoodsData(
+  CategoryListData(
       {this.image,
         this.oriPrice,
         this.presentPrice,
         this.goodsName,
         this.goodsId});
 
-  CategoryGoodsData.fromJson(Map<String, dynamic> json) {
+  CategoryListData.fromJson(Map<String, dynamic> json) {
     image = json['image'];
     oriPrice = json['oriPrice'];
     presentPrice = json['presentPrice'];
@@ -59,3 +59,4 @@ class CategoryGoodsData {
     return data;
   }
 }
+
