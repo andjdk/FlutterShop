@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_shop/model/category_goods.dart';
 import 'package:flutter_shop/model/category_info.dart';
+import 'package:flutter_shop/provide/category_goods_list.dart';
 import 'package:flutter_shop/provide/child_category.dart';
 import 'package:flutter_shop/service_method/service_method.dart';
 import 'dart:convert';
@@ -31,6 +32,24 @@ class CategoryPage extends StatelessWidget {
   }
 }
 
+void _getGoodsList(BuildContext context) async {
+  var data = {"categoryId": Provide.value<ChildCategory>(context).categoryId, "categorySubId": Provide.value<ChildCategory>(context).subId, "page": 1};
+  await request('getGoodsList', formData: data).then((val) {
+    var data = json.decode(val.toString());
+    try {
+      CategoryGoodsListModel goodsList = CategoryGoodsListModel.fromJson(data);
+      if(goodsList ==null){
+        Provide.value<CategoryGoodsListProvide>(context).getCategoryListData([]);
+      }else{
+        Provide.value<CategoryGoodsListProvide>(context).getCategoryListData(goodsList.data);
+      }
+
+    } catch (e) {
+      print("出现异常：$e");
+    }
+  });
+}
+
 class LeftCategoryNav extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -50,6 +69,7 @@ class _LeftCategoryNavState extends State<LeftCategoryNav> {
 
   @override
   Widget build(BuildContext context) {
+    _getGoodsList(context);
     return Container(
         width: ScreenUtil().setWidth(180),
         decoration: BoxDecoration(
@@ -64,13 +84,15 @@ class _LeftCategoryNavState extends State<LeftCategoryNav> {
   Widget _leftInkWell(int index) {
     bool isClick = false;
     isClick = (index == listIndex);
+
     return InkWell(
       onTap: () {
         setState(() {
           listIndex = index;
         });
         var childList = list[index].bxMallSubDto;
-        Provide.value<ChildCategory>(context).getChildCategory(childList);
+        Provide.value<ChildCategory>(context).getChildCategory(childList,list[index].mallCategoryId);
+        _getGoodsList(context);
       },
       child: Container(
         height: ScreenUtil().setHeight(100),
@@ -92,7 +114,7 @@ class _LeftCategoryNavState extends State<LeftCategoryNav> {
         list = categoryModel.data;
       });
       Provide.value<ChildCategory>(context)
-          .getChildCategory(list[0].bxMallSubDto);
+          .getChildCategory(list[0].bxMallSubDto,list[0].mallCategoryId);
     });
   }
 }
@@ -106,6 +128,7 @@ class RightCategoryNav extends StatefulWidget {
 
 class _RightCategoryNavState extends State<RightCategoryNav> {
 //  List list = ['全部','名酒','宝丰','北京二锅头','舍得','五粮液','茅台','散白','名酒'];
+  bool isClick = false;
   @override
   Widget build(BuildContext context) {
     return Provide<ChildCategory>(
@@ -121,13 +144,21 @@ class _RightCategoryNavState extends State<RightCategoryNav> {
               scrollDirection: Axis.horizontal,
               itemCount: childCategoryList.childCategoryList.length,
               itemBuilder: (context, index) {
+                isClick = (index == Provide.value<ChildCategory>(context).childIndex);
                 return InkWell(
-                  onTap: () {},
+                  onTap: () {
+                    Provide.value<ChildCategory>(context).changedChildIndex(index,childCategoryList.childCategoryList[index].mallSubId);
+
+                    _getGoodsList(context);
+                  },
                   child: Container(
                     padding: EdgeInsets.fromLTRB(5, 10, 5, 10),
                     child: Text(
                       childCategoryList.childCategoryList[index].mallSubName,
-                      style: TextStyle(fontSize: ScreenUtil().setSp(28)),
+                      style: TextStyle(
+                          fontSize: ScreenUtil().setSp(28),
+                          color: isClick ? Colors.pink:Colors.black
+                      ),
                     ),
                   ),
                 );
@@ -138,6 +169,8 @@ class _RightCategoryNavState extends State<RightCategoryNav> {
   }
 }
 
+
+
 class CategoryGoodsList extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -146,26 +179,38 @@ class CategoryGoodsList extends StatefulWidget {
 }
 
 class _CategoryGoodsListState extends State<CategoryGoodsList> {
-  List<CategoryListData> categoryGoodsList = [];
 
-  @override
-  void initState() {
-    _getGoodsList();
-    super.initState();
-  }
-
+  var scrollController = new ScrollController();
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-        flex: 1,
-        child:Container(
-          width: ScreenUtil().setWidth(570),
-          child: _goodsItem(),
-        ) ,
-      );
+    return Provide<CategoryGoodsListProvide>(
+      builder: (context,child,data){
+        try{
+          if(Provide.value<ChildCategory>(context).page==1){
+            scrollController.jumpTo(0.0);
+          }
+        }catch (e){
+          print('进入页面第一次初始化：$e');
+        }
+        if(data.goodsList.length>0){
+          return Expanded(
+            child: Container(
+              width: ScreenUtil().setWidth(570),
+              child: SingleChildScrollView(
+                controller: scrollController,
+                scrollDirection: Axis.vertical,
+                child: _goodsItem(data.goodsList),
+              ),
+            ),
+          );
+        }else{
+          return Text("暂时没有相关商品");
+        }
+      },
+    );
   }
 
-  Widget _goodsItem() {
+  Widget _goodsItem(List categoryGoodsList) {
     if (categoryGoodsList.length != 0) {
       List<Widget> goodsWidget = categoryGoodsList.map((val) {
         return InkWell(
@@ -207,24 +252,7 @@ class _CategoryGoodsListState extends State<CategoryGoodsList> {
         children: goodsWidget,
       );
     } else {
-      return Text("没有相关商品");
+      return Text("暂时没有相关商品");
     }
-  }
-
-  void _getGoodsList() async {
-    var data = {"categoryId": '4', "categorySubId": "", "page": 1};
-    await request('getGoodsList', formData: data).then((val) {
-      var data = json.decode(val.toString());
-      try {
-        CategoryGoodsListModel goodsList =
-            CategoryGoodsListModel.fromJson(data);
-
-        setState(() {
-          categoryGoodsList = goodsList.data;
-        });
-      } catch (e) {
-        print("出现异常：$e");
-      }
-    });
   }
 }

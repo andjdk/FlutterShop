@@ -15,6 +15,7 @@ Future request(url,{formData}) async{
     if(formData == null){
       response = await dio.post(servicePath[url]);
     }else{
+      print("request data：$formData");
       response = await dio.post(servicePath[url],data: formData);
     }
     print("request result：$response");
