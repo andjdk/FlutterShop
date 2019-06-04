@@ -12,7 +12,7 @@ class ChildCategory with ChangeNotifier{
     page =1;
     this.categoryId = categoryId;
     BxMallSubDto all = BxMallSubDto();
-    all.mallSubId='00';
+    all.mallSubId='';
     all.mallCategoryId= '00';
     all.comments='null';
     all.mallSubName = '全部';

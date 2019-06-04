@@ -5,4 +5,5 @@ const servicePath = {
   'homePageHotGoodsContent':serviceUrlTest+'homePageHotGoodsContent',//商城首页火爆专区
   'getCategoryInfo':serviceUrlTest+'getCategoryInfo',//分类
   'getGoodsList':serviceUrlTest+'getGoodsList',//商品列表信息
+  'getGoodsDetailInfo':serviceUrlTest+'getGoodsDetailInfo',//商品详情信息
 };
