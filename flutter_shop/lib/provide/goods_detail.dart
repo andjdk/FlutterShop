@@ -7,6 +7,8 @@ import 'package:flutter_shop/service_method/service_method.dart';
 class GoodsDetailInfoProvide with ChangeNotifier{
 
   GoodsDetailInfo goodsDetailInfo=null;
+  bool isLeft =true;
+  bool isRight = false;
 
   getGoodsDetailInfo(String goodsId) async{
     var formData = {'goodsId':goodsId};
@@ -16,6 +18,17 @@ class GoodsDetailInfoProvide with ChangeNotifier{
       goodsDetailInfo = GoodsDetailInfo.fromJson(responseData);
       notifyListeners();
     });
+  }
+
+  changeLeftAndRight(String val){
+    if(val == 'left'){
+      isLeft= true;
+      isRight = false;
+    }else{
+      isLeft= false;
+      isRight = true;
+    }
+    notifyListeners();
   }
 
 }
