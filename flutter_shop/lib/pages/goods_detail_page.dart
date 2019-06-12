@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_shop/model/goods_detail_info.dart';
+import 'package:flutter_shop/provide/cart_list.dart';
 import 'package:flutter_shop/provide/goods_detail.dart';
 import 'package:flutter_shop/service_method/service_method.dart';
+import 'package:flutter_shop/utils/date_util.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provide/provide.dart';
 import 'package:flutter_html/flutter_html.dart';
 
@@ -60,10 +63,7 @@ class _GoodsDetailPageSate extends State<GoodsDetailPage> {
                       left: 0,
                       child:Container(
                         height: ScreenUtil().setHeight(80),
-                        child:  Text(
-                          "测试",
-                          style: TextStyle(fontSize: 20),
-                        ),
+                        child: _detailBottom()
                       ),
                     )
                   ],
@@ -267,7 +267,7 @@ class _GoodsDetailPageSate extends State<GoodsDetailPage> {
           .data
           .goodComments;
       var isLeft = Provide.value<GoodsDetailInfoProvide>(context).isLeft;
-      print(">>>> $goodsDetail");
+
       if (isLeft) {
         return Container(
           child: Html(data: goodsDetail),
@@ -300,10 +300,51 @@ class _GoodsDetailPageSate extends State<GoodsDetailPage> {
             children: <Widget>[
               Text(goodsComment[index].userName),
               Text(goodsComment[index].comments),
-//              Text(goodsComment[index].comments)
+              Padding(
+                padding: const EdgeInsets.only(top:5.0),
+                child: Text(DateUtil.getDateStrByMs(goodsComment[index].discussTime),style: TextStyle(fontSize: ScreenUtil().setSp(20),color: Colors.black26),),
+              )
             ],
           ),
         );
     });
+  }
+
+  Widget _detailBottom(){
+    return Row(
+      children: <Widget>[
+        Container(
+          width: ScreenUtil().setWidth(120),
+          height: ScreenUtil().setHeight(80),
+          alignment: Alignment.center,
+          child: Icon(Icons.shopping_cart,color: Colors.pink,),
+        ),
+        InkWell(
+          onTap: (){
+            GoodInfo goodsDetail = Provide.value<GoodsDetailInfoProvide>(context)
+                .goodsDetailInfo
+                .data
+                .goodInfo;
+            Provide.value<CartProvide>(context).save(goodsDetail.goodsId, goodsDetail.goodsName, 1, goodsDetail.oriPrice, goodsDetail.image1);
+//            Fluttertoast.showToast(msg: '加入成功');
+          },
+          child: Container(
+            width: ScreenUtil().setWidth(315),
+            height: ScreenUtil().setHeight(80),
+            alignment: Alignment.center,
+            color: Colors.green,
+            child: Text('加入购物车',style:TextStyle(color: Colors.white),),
+          ),
+        ),
+        Container(
+          width: ScreenUtil().setWidth(315),
+          height: ScreenUtil().setHeight(80),
+          alignment: Alignment.center,
+          color: Colors.red,
+          child: Text('立即购买',style:TextStyle(color: Colors.white),),
+        )
+
+      ],
+    );
   }
 }

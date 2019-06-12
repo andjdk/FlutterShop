@@ -13,7 +13,6 @@ class GoodsDetailInfoProvide with ChangeNotifier{
   getGoodsDetailInfo(String goodsId) async{
     var formData = {'goodsId':goodsId};
     await request('getGoodsDetailInfo',formData: formData).then((val){
-      print('ddd====> ${val.toString()}');
       var responseData = json.decode(val.toString());
       goodsDetailInfo = GoodsDetailInfo.fromJson(responseData);
       notifyListeners();

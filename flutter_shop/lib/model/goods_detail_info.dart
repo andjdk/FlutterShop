@@ -69,7 +69,7 @@ class GoodInfo {
   String image1;
   String image2;
   String goodsSerialNumber;
-  int oriPrice;
+  double oriPrice;
   double presentPrice;
   String comPic;
   int state;
@@ -140,7 +140,7 @@ class GoodComments {
   int sCORE;
   String comments;
   String userName;
-  var discussTime;
+  int discussTime;
 
   GoodComments({this.sCORE, this.comments, this.userName, this.discussTime});
 
