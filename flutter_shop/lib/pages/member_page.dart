@@ -8,7 +8,7 @@ class MemberPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('会员中心'),
+          elevation: 0,
         ),
         body: ListView(
           children: <Widget>[
@@ -24,8 +24,8 @@ class MemberPage extends StatelessWidget {
 Widget _topHeader() {
   return Container(
     width: ScreenUtil().setWidth(750),
-    padding: EdgeInsets.all(20),
-    color: Colors.pinkAccent,
+    padding: EdgeInsets.only(bottom: 20),
+    color: Colors.pink,
     child: Column(
       children: <Widget>[
         Container(
