@@ -6,9 +6,39 @@ import 'package:flutter_shop/pages/category_page.dart';
 import 'package:flutter_shop/pages/home_page.dart';
 import 'package:flutter_shop/pages/member_page.dart';
 import 'package:flutter_shop/provide/current_index.dart';
+import 'package:jpush_flutter/jpush_flutter.dart';
 import 'package:provide/provide.dart';
+import 'package:flutter/services.dart';
 
 class IndexPage extends StatelessWidget {
+
+  JPush jPush = JPush();
+
+  Future<void> initPlatFormatState(context) async {
+    jPush.setup(
+      appKey: "0e1add721eb22e3079087c97",
+      channel: "theChannel",
+      production: false,
+      debug: true,
+    );
+    jPush.applyPushAuthority(
+        new NotificationSettingsIOS(sound: true, alert: true, badge: true));
+
+    try {
+      jPush.addEventHandler(
+          onReceiveNotification: (Map<String, dynamic> message) async {
+            print('onReceiveNotification : $message');
+          }, onOpenNotification: (Map<String, dynamic> message) async {
+        print('onOpenNotification : $message');
+        await Provide.value<CurrentIndexProvide>(context).changeIndex(2);
+      }, onReceiveMessage: (Map<String, dynamic> message) async {
+        print('onReceiveMessage : $message');
+      });
+    } on PlatformException {
+      print('PlatformException : $PlatformException');
+    }
+  }
+
   final List<BottomNavigationBarItem> bottomTabs = [
     BottomNavigationBarItem(
         icon:Icon(CupertinoIcons.home),
@@ -37,6 +67,7 @@ class IndexPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    initPlatFormatState(context);
     ScreenUtil.instance = ScreenUtil(width: 750, height: 1334)..init(context);
     return Provide<CurrentIndexProvide>(
 
