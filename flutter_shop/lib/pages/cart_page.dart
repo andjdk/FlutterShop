@@ -94,7 +94,7 @@ class CartPage extends StatelessWidget {
                     children: <Widget>[
                       Text('合计：'),
                       Text(
-                        '￥ $allPrice',
+                        '￥ ${(allPrice).toStringAsFixed(2)}',
                         style: TextStyle(color: Colors.pink),
                       )
                     ],

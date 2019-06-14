@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_shop/model/goods_detail_info.dart';
 import 'package:flutter_shop/provide/cart_list.dart';
+import 'package:flutter_shop/provide/current_index.dart';
 import 'package:flutter_shop/provide/goods_detail.dart';
 import 'package:flutter_shop/service_method/service_method.dart';
 import 'package:flutter_shop/utils/date_util.dart';
@@ -47,7 +48,8 @@ class _GoodsDetailPageSate extends State<GoodsDetailPage> {
                     child: Stack(
                   children: <Widget>[
                     Container(
-                      margin: EdgeInsets.only(bottom: ScreenUtil().setHeight(80)),
+                      margin:
+                          EdgeInsets.only(bottom: ScreenUtil().setHeight(80)),
                       child: ListView(
                         children: <Widget>[
                           _detailsTopArea(),
@@ -61,10 +63,9 @@ class _GoodsDetailPageSate extends State<GoodsDetailPage> {
                     Positioned(
                       bottom: 0,
                       left: 0,
-                      child:Container(
-                        height: ScreenUtil().setHeight(80),
-                        child: _detailBottom()
-                      ),
+                      child: Container(
+                          height: ScreenUtil().setHeight(80),
+                          child: _detailBottom()),
                     )
                   ],
                 ));
@@ -213,13 +214,9 @@ class _GoodsDetailPageSate extends State<GoodsDetailPage> {
         padding: EdgeInsets.all(10.0),
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              width: 1,
-              color: isLeft ? Colors.pink : Colors.black12
-            )
-          )
-        ),
+            border: Border(
+                bottom: BorderSide(
+                    width: 1, color: isLeft ? Colors.pink : Colors.black12))),
         child: Text(
           '详情',
           style: TextStyle(color: isLeft ? Colors.pink : Colors.black),
@@ -239,14 +236,10 @@ class _GoodsDetailPageSate extends State<GoodsDetailPage> {
         padding: EdgeInsets.all(10.0),
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border(
-            bottom: BorderSide(
-              width: 1,
-              color: isRight ? Colors.pink : Colors.black12
-            )
-          )
-        ),
+            color: Colors.white,
+            border: Border(
+                bottom: BorderSide(
+                    width: 1, color: isRight ? Colors.pink : Colors.black12))),
         child: Text(
           '评论',
           style: TextStyle(color: isRight ? Colors.pink : Colors.black),
@@ -273,11 +266,11 @@ class _GoodsDetailPageSate extends State<GoodsDetailPage> {
           child: Html(data: goodsDetail),
         );
       } else {
-        if(goodsComment.length>0){
+        if (goodsComment.length > 0) {
           return Container(
             child: _commentList(goodsComment),
           );
-        }else{
+        } else {
           return Container(
             child: Text('暂时还没有评论喔！'),
           );
@@ -286,46 +279,98 @@ class _GoodsDetailPageSate extends State<GoodsDetailPage> {
     });
   }
 
-  Widget _commentList(List goodsComment){
+  Widget _commentList(List goodsComment) {
     return ListView.builder(
         itemCount: goodsComment.length,
         shrinkWrap: true,
-        itemBuilder:(context,index){
-        return Container(
-          color: Colors.white,
-          width: ScreenUtil().setWidth(750),
-          padding: EdgeInsets.only(left:10,top:10,right:10,bottom: 80),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(goodsComment[index].userName),
-              Text(goodsComment[index].comments),
-              Padding(
-                padding: const EdgeInsets.only(top:5.0),
-                child: Text(DateUtil.getDateStrByMs(goodsComment[index].discussTime),style: TextStyle(fontSize: ScreenUtil().setSp(20),color: Colors.black26),),
-              )
-            ],
-          ),
-        );
-    });
+        itemBuilder: (context, index) {
+          return Container(
+            color: Colors.white,
+            width: ScreenUtil().setWidth(750),
+            padding: EdgeInsets.only(left: 10, top: 10, right: 10, bottom: 80),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(goodsComment[index].userName),
+                Text(goodsComment[index].comments),
+                Padding(
+                  padding: const EdgeInsets.only(top: 5.0),
+                  child: Text(
+                    DateUtil.getDateStrByMs(goodsComment[index].discussTime),
+                    style: TextStyle(
+                        fontSize: ScreenUtil().setSp(20),
+                        color: Colors.black26),
+                  ),
+                )
+              ],
+            ),
+          );
+        });
   }
 
-  Widget _detailBottom(){
+  Widget _detailBottom() {
     return Row(
       children: <Widget>[
-        Container(
-          width: ScreenUtil().setWidth(120),
-          height: ScreenUtil().setHeight(80),
-          alignment: Alignment.center,
-          child: Icon(Icons.shopping_cart,color: Colors.pink,),
+        Stack(
+          children: <Widget>[
+            InkWell(
+              onTap: (){
+                Provide.value<CurrentIndexProvide>(context).changeIndex(2);
+                Navigator.pop(context);
+              },
+              child: Container(
+                width: ScreenUtil().setWidth(120),
+                height: ScreenUtil().setHeight(80),
+                alignment: Alignment.center,
+                child: Icon(
+                  Icons.shopping_cart,
+                  size: 35,
+                  color: Colors.red,
+                ),
+              ),
+            ),
+            Provide<CartProvide>(
+              builder: (context, child, scope) {
+                int count = Provide.value<CartProvide>(context).allGoodsCount;
+                if(count>0){
+                  return Positioned(
+                      top: 0,
+                      right: 10,
+                      child: Container(
+                        padding: EdgeInsets.fromLTRB(6, 3, 6, 3),
+                        decoration: BoxDecoration(
+                            color: Colors.pink,
+                            border: Border.all(color:Colors.pink,width: 2),
+                            borderRadius: BorderRadius.circular(12)
+                        ),
+                        child: Text(
+                          '$count',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: ScreenUtil().setSp(22)),
+                        ),
+                      ));
+                }else{
+                  return Text('');
+                }
+
+              },
+            )
+          ],
         ),
         InkWell(
-          onTap: (){
-            GoodInfo goodsDetail = Provide.value<GoodsDetailInfoProvide>(context)
-                .goodsDetailInfo
-                .data
-                .goodInfo;
-            Provide.value<CartProvide>(context).save(goodsDetail.goodsId, goodsDetail.goodsName, 1, goodsDetail.oriPrice, goodsDetail.image1);
+          onTap: () {
+            GoodInfo goodsDetail =
+                Provide.value<GoodsDetailInfoProvide>(context)
+                    .goodsDetailInfo
+                    .data
+                    .goodInfo;
+            Provide.value<CartProvide>(context).save(
+                goodsDetail.goodsId,
+                goodsDetail.goodsName,
+                1,
+                goodsDetail.oriPrice,
+                goodsDetail.image1);
 //            Fluttertoast.showToast(msg: '加入成功');
           },
           child: Container(
@@ -333,7 +378,10 @@ class _GoodsDetailPageSate extends State<GoodsDetailPage> {
             height: ScreenUtil().setHeight(80),
             alignment: Alignment.center,
             color: Colors.green,
-            child: Text('加入购物车',style:TextStyle(color: Colors.white),),
+            child: Text(
+              '加入购物车',
+              style: TextStyle(color: Colors.white),
+            ),
           ),
         ),
         Container(
@@ -341,9 +389,11 @@ class _GoodsDetailPageSate extends State<GoodsDetailPage> {
           height: ScreenUtil().setHeight(80),
           alignment: Alignment.center,
           color: Colors.red,
-          child: Text('立即购买',style:TextStyle(color: Colors.white),),
+          child: Text(
+            '立即购买',
+            style: TextStyle(color: Colors.white),
+          ),
         )
-
       ],
     );
   }
